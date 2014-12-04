@@ -1,4 +1,2 @@
-spatial-clustering
-==================
-
-Spatial data clustering study
+Clustering spatial data
+============================================
