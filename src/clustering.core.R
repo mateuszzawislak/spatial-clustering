@@ -1,35 +1,75 @@
+#
+# SPDB project
+# Spatial data clustering study
+#
+# author: Mateusz Zawislak
+# December 2014
+#
+
 library(sp)
 
 
-# http://stackoverflow.com/questions/21095643/approaches-for-spatial-geodesic-latitude-longitude-clustering-in-r-with-geodesic
-
-cities <- read.csv("C:/Users/Mateusz/Documents/R-Projects/GeoLiteCity-Location.csv",header=T,skip=1)
-CA     <- cities[cities$country=="US" & cities$region=="CA",]
-CA     <- CA[sample(1:nrow(CA),100),]   # 100 random cities in California
-locationsData     <- data.frame(long=CA$long, lat=CA$lat, city=CA$city, metroCode=CA$metroCode)
-
-# zwraca wektor o dlugosci rownej dlugosci wektora p1
-# zwracany wektor zawiera odleglosci miedzy kolejnymi punktami z p1 a punktem p2
-dMza <- function(p1, p2) {
-  distHaversine(p1,p2)
+# distance metrics
+distance.bray.curtis <- function(val1, val2) {
+  abs(val1 - val2) / (val1 + val2)
 }
 
-# returns distance matrix
-metric.distance <- function(locationsData) {
-  require(geosphere)
-  distances.from.point <- function(numerWiersza,lokalizacje) {         # z[1:2] contain long, lat
-    dist <- rep(0,nrow(lokalizacje))
-    # ode danego wiersza do konca zeby nie powtarzac macierzy symetrycznie
-    dist[numerWiersza:nrow(lokalizacje)] <- dMza(lokalizacje[numerWiersza:nrow(lokalizacje),1:2],lokalizacje[numerWiersza,1:2])
-    return(dist)
+distance.real <- function(val1, val2) {
+  difference <- abs(val1 - val2)
+  if(difference != 0) {
+    difference = difference / sqrt(val1*val1+val2*val2)
   }
   
-  # dla kazdego wiersza zaaplikuj funckje d do wszyskich lokalizacji
-  # locationsData to parametr funkcji d
-  dm <- do.call(cbind, lapply(1:nrow(locationsData), distances.from.point, locationsData))
+  difference
+}
+
+objects.distance <- function(d1, d2) {
+  distance = 0
+  for(i in 1:length(d1)) {
+    # TODO
+    distance = distance + distance.real(d1[1,i],d2[1,i])
+  }
+  
+  distance
+}
+
+# returns the vector of distances from object to each one from objects
+# vector length is equal to objects count
+calculate.distances.from.object <- function(objects, object) {
+  distances <- c()
+  for(i in 1:nrow(objects)) {
+    dist <- objects.distance(objects[i,], object)
+    distances <- append(distances, dist)
+  }
+  
+  distances
+}
+
+# calculates objects distance matrix
+# calculates only bottom-left part of matrix, because it is symetric
+calculate.distance.matrix <- function(objects) {
+  require(geosphere)
+  
+  distances.from.object <- function(objectIndex, objects) {
+    distances <- rep(0,nrow(objects))
+
+    # from the given object to the end of the row
+    distances[objectIndex:nrow(objects)] <- calculate.distances.from.object(objects[objectIndex:nrow(objects),2:ncol(objects)],objects[objectIndex,2:ncol(objects)])
+    return(distances)
+  }
+  
+  # for every object calculate distances to all objects
+  # hint: cbind to pionowe z³¹cznie wektorów
+  dm <- do.call(cbind, lapply(1:nrow(objects), distances.from.object, objects))
   return(as.dist(dm))
 }
 
-d      <- metric.distance(locationsData)   # distance matrix
-km <- kmeans(metric.distance(locationsData),centers=4)
 
+main <- function() {
+  uciData <- read.csv(file="D:/Github/spatial-clustering/data/wine.data", head=FALSE, sep=",", skip=0)
+  
+  # distance matrix
+  objects.distances.matrix <- calculate.distance.matrix(uciData)
+  km <- kmeans(objects.distances.matrix, centers=3)
+  print(km)
+}
