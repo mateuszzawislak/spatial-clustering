@@ -12,9 +12,10 @@ source('clustering.quality.R')
 
 wine.data.description <- list(
   "class.column" = "V1",
+  "ignore.columns" = c("V9"),
+  "string.columns" = c("V10"),
   "points" = list(list("x" = "V2", "y" = "V5")),
-  "geographic.coordinates" = list(list("long" = "V3", "lat" = "V4")),
-  "ignore.columns" = c("V9")
+  "geographic.coordinates" = list(list("long" = "V3", "lat" = "V4"))
 )
 
 main <- function() {

@@ -7,12 +7,14 @@
 #
 
 library(sp)
+library(stringdist)
 
 
 # by default columns are treated as real
 example.data.description <- list(
     "class.column" = "V1",
     "ignore.columns" = "V9",
+    "string.columns" = c("V10"),
     "points" = list(list("x" = "V2", "y" = "V3"),list("x" = "V4", "y" = "V5")),
     "geographic.coordinates" = list(list("long" = "V7", "lat" = "V6"))
   )
@@ -75,6 +77,10 @@ distance.euclidean <- function(x1, y1, x2, y2) {
   dist(rbind(c(x1,y1),c(x2,y2)), method = "euclidean")
 }
 
+distance.levensthein <- function(x,y){
+  stringdist(x, y, method = c("lv"))
+}
+
 objects.distance <- function(d1, d2, data.description) {
   distance = 0
   
@@ -109,7 +115,17 @@ objects.distance <- function(d1, d2, data.description) {
       )
     )
   }
+  
+  # string attributes
+  if(length(data.description$string.columns) > 0) {
+    distance = distance + do.call(sum, lapply(data.description$string.columns,function(column) {
+      left.attributes <<- left.attributes[left.attributes != column]
+      
+      distance.levensthein(d1[column], d2[column])
+    }))
+  }
 
+  # distance for attributes type real
   if(length(d1[left.attributes]) > 0) {
     distance = distance + do.call(sum, list(mapply(distance.real,d1[left.attributes],d2[left.attributes])))
   }
