@@ -11,9 +11,10 @@ setwd("D:/Github/spatial-clustering/src")
 source('clustering.quality.R')
 
 wine.data.description <- list(
-  "classIndex" = 1,
+  "class.column" = "V1",
   "points" = list(list("x" = "V2", "y" = "V5")),
-  "geographic.coordinates" = list(list("long" = "V3", "lat" = "V4"))
+  "geographic.coordinates" = list(list("long" = "V3", "lat" = "V4")),
+  "ignore.columns" = c("V9")
 )
 
 main <- function() {

@@ -11,14 +11,15 @@ library(sp)
 
 # by default columns are treated as real
 example.data.description <- list(
-    "classIndex" = 1,
+    "class.column" = "V1",
+    "ignore.columns" = "V9",
     "points" = list(list("x" = "V2", "y" = "V3"),list("x" = "V4", "y" = "V5")),
     "geographic.coordinates" = list(list("long" = "V7", "lat" = "V6"))
   )
 
 printDataDescription <- function(description) {
-  print('Class index')
-  print(description$classIndex)
+  print('Class column')
+  print(description$class.column)
   
   if(length(description$points) > 0 ) {
     for(i in 1:length(description$points)) {
@@ -37,9 +38,18 @@ get.column.name <- function(data, index) {
   colnames(data)[index]
 }
 
-get.attributes.indexes <- function(columns.number, data.description) {
-  indexes <- 1:columns.number
-  indexes[-data.description$classIndex]
+get.attributes.columns <- function(data, data.description) {
+  column.names <- colnames(data)
+  column.names <- column.names[-get.column.index(data, data.description$class.column)]
+  
+  if(length(data.description$ignore.columns) > 0) {
+    lapply(data.description$ignore.columns,function(col.name) {
+        column.names <<- column.names[-match(col.name,column.names)]
+      }
+    )
+  }
+  
+  column.names
 }
 
 
@@ -122,7 +132,7 @@ calculate.distance.matrix <- function(objects, data.description) {
   distances.from.object <- function(objectIndex, objects, data.description) {
     distances <- rep(0,nrow(objects))
 
-    attributes.indexes <- get.attributes.indexes(ncol(objects), data.description)
+    attributes.indexes <- get.attributes.columns(objects, data.description)
     
     # from the given object to the end of the row
     distances[objectIndex:nrow(objects)] <- calculate.distances.from.object(objects[objectIndex:nrow(objects),attributes.indexes],objects[objectIndex,attributes.indexes],data.description)
