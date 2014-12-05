@@ -6,7 +6,16 @@
 # December 2014
 #
 
-source('clustering.quality.r')
+setwd("D:/Github/spatial-clustering/src")
 
-test <- function() {
+source('clustering.quality.R')
+
+wine.data.description <- list(
+  "classIndex" = 1
+)
+
+main <- function() {
+  uciData <- read.csv(file="../data/wine.data", head=FALSE, sep=",", skip=0)
+  
+  test.clustering(uciData, wine.data.description)
 }

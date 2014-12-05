@@ -6,21 +6,24 @@
 # December 2014
 #
 
-setwd("D:/Github/spatial-clustering/src")
-
 source('clustering.core.R')
 
-wine.data.description <- list(
-  "classIndex" = 1
-)
+rate.cluster <- function(cluster.model, data, data.description) {
+  class.column <- data.description$classIndex
+  
+  # TODO
+}
 
 remove.class.column <- function(data, classIndex) {
   data[,-classIndex]
 }
 
-main <- function() {
-  uciData <- read.csv(file="../data/wine.data", head=FALSE, sep=",", skip=0)
+test.clustering <- function(data, data.description) {
+  cluster.model <- spatial.cluster(data, data.description)
   
-  cluster.model <- spatial.cluster(uciData, wine.data.description)
+  quality <- rate.cluster(cluster.model, data, data.description)
+  
   print(cluster.model)
+  print('Quality')
+  print(quality)
 }
