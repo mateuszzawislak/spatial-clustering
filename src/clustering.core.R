@@ -12,8 +12,8 @@ library(sp)
 # by default columns are treated as real
 example.data.description <- list(
     "classIndex" = 1,
-    "points" = list(list("x" = 2, "y" = 3),list("x" = 4, "y" = 5)),
-    "geoPoints" = list(list("long" = 7, "lat" = 6))
+    "points" = list(list("x" = "V2", "y" = "V3"),list("x" = "V4", "y" = "V5")),
+    "geoPoints" = list(list("long" = "V7", "lat" = "V6"))
   )
 
 printDataDescription <- function(description) {
@@ -57,10 +57,33 @@ distance.real <- function(val1, val2) {
   difference
 }
 
+distance.euclidean <- function(x1, y1, x2, y2) {
+  dist(rbind(c(x1,y1),c(x2,y2)), method = "euclidean")
+}
+
 objects.distance <- function(d1, d2, data.description) {
   distance = 0
   
-  distance = distance + do.call(sum, list(mapply(distance.real,d1,d2)))
+  left.attributes <- names(d1)
+  
+  # points
+  if(length(data.description$points) > 0) {
+    distance = distance + do.call(sum, lapply(data.description$points, function(point) {
+            x.col = point$x
+            y.col = point$y
+            
+            left.attributes <<- left.attributes[left.attributes != x.col] 
+            left.attributes <<- left.attributes[left.attributes != y.col] 
+            
+            distance.euclidean(d1[x.col], d1[y.col], d2[x.col], d2[y.col])
+          }
+        )
+      )
+  }
+
+  if(length(d1[left.attributes]) > 0) {
+    distance = distance + do.call(sum, list(mapply(distance.real,d1[left.attributes],d2[left.attributes])))
+  }
   
   distance
 }
@@ -68,6 +91,7 @@ objects.distance <- function(d1, d2, data.description) {
 # returns the vector of distances from object to each one from objects
 # vector length is equal to objects count
 calculate.distances.from.object <- function(objects, object, data.description) {
+  print('speeding...')
   distances <- apply(objects,1,function(neighbour) { objects.distance(neighbour,object,data.description) })
 }
 

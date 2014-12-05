@@ -11,7 +11,8 @@ setwd("D:/Github/spatial-clustering/src")
 source('clustering.quality.R')
 
 wine.data.description <- list(
-  "classIndex" = 1
+  "classIndex" = 1,
+  "points" = list(list("x" = "V2", "y" = "V3"))
 )
 
 main <- function() {
