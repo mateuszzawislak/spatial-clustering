@@ -59,10 +59,8 @@ distance.real <- function(val1, val2) {
 
 objects.distance <- function(d1, d2, data.description) {
   distance = 0
-  for(i in 1:length(d1)) {
-    # TODO
-    distance = distance + distance.real(d1[1,i],d2[1,i])
-  }
+  
+  distance = distance + do.call(sum, list(mapply(distance.real,d1,d2)))
   
   distance
 }
@@ -70,13 +68,7 @@ objects.distance <- function(d1, d2, data.description) {
 # returns the vector of distances from object to each one from objects
 # vector length is equal to objects count
 calculate.distances.from.object <- function(objects, object, data.description) {
-  distances <- c()
-  for(i in 1:nrow(objects)) {
-    dist <- objects.distance(objects[i,], object, data.description)
-    distances <- append(distances, dist)
-  }
-  
-  distances
+  distances <- apply(objects,1,function(neighbour) { objects.distance(neighbour,object,data.description) })
 }
 
 # calculates objects distance matrix

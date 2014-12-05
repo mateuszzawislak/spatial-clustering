@@ -17,5 +17,5 @@ wine.data.description <- list(
 main <- function() {
   uciData <- read.csv(file="../data/wine.data", head=FALSE, sep=",", skip=0)
   
-  test.clustering(uciData, wine.data.description)
+  system.time(test.clustering(uciData, wine.data.description))
 }
