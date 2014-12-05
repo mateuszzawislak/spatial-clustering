@@ -21,7 +21,9 @@ example.data.description <- list(
 
 printDataDescription <- function(description) {
   print('Class column')
-  print(description$class.column)
+  if(exists(description$class.column)) {
+    print(description$class.column)
+  }
   
   if(length(description$points) > 0 ) {
     for(i in 1:length(description$points)) {
@@ -42,7 +44,9 @@ get.column.name <- function(data, index) {
 
 get.attributes.columns <- function(data, data.description) {
   column.names <- colnames(data)
-  column.names <- column.names[-get.column.index(data, data.description$class.column)]
+  if(is.null(data.description$class.column) == FALSE) {
+    column.names <- column.names[-get.column.index(data, data.description$class.column)]
+  }
   
   if(length(data.description$ignore.columns) > 0) {
     lapply(data.description$ignore.columns,function(col.name) {
@@ -110,7 +114,7 @@ objects.distance <- function(d1, d2, data.description) {
           left.attributes <<- left.attributes[left.attributes != long.col] 
           left.attributes <<- left.attributes[left.attributes != lat.col] 
           
-          distance.haversine(d1[long.col], d1[lat.col], d2[,long.col], d2[,lat.col])
+          distance.haversine(d1[,long.col], d1[,lat.col], d2[,long.col], d2[,lat.col])
         }
       )
     )
@@ -137,7 +141,7 @@ objects.distance <- function(d1, d2, data.description) {
 # vector length is equal to objects count
 calculate.distances.from.object <- function(objects, object, data.description) {
   print('speeding...')
-  distances <- apply(objects,1,function(neighbour) { objects.distance(neighbour,object,data.description) })
+  distances <- lapply(1:nrow(objects),function(i) { objects.distance(objects[i,],object,data.description) })
 }
 
 # calculates objects distance matrix

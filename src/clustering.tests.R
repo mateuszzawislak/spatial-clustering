@@ -11,15 +11,14 @@ setwd("D:/Github/spatial-clustering/src")
 source('clustering.quality.R')
 
 wine.data.description <- list(
-  "class.column" = "V1",
   "ignore.columns" = c("V9"),
-  "string.columns" = c("V10"),
+  "string.columns" = c("V1"),
   "points" = list(list("x" = "V2", "y" = "V5")),
   "geographic.coordinates" = list(list("long" = "V3", "lat" = "V4"))
 )
 
 main <- function() {
-  uciData <- read.csv(file="../data/wine.data", head=FALSE, sep=",", skip=0)
+  uciData <- read.csv(file="../data/wine.data", head=FALSE, sep=",", skip=0, dec=".")
   
   system.time(test.clustering(uciData, wine.data.description))
 }
