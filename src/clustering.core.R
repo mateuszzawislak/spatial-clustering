@@ -13,7 +13,7 @@ library(sp)
 example.data.description <- list(
     "classIndex" = 1,
     "points" = list(list("x" = "V2", "y" = "V3"),list("x" = "V4", "y" = "V5")),
-    "geoPoints" = list(list("long" = "V7", "lat" = "V6"))
+    "geographic.coordinates" = list(list("long" = "V7", "lat" = "V6"))
   )
 
 printDataDescription <- function(description) {
@@ -57,6 +57,10 @@ distance.real <- function(val1, val2) {
   difference
 }
 
+distance.haversine <- function(long1, lat1, long2, lat2) {
+  distHaversine(c(long1,lat1),c(long2,lat2))
+}
+
 distance.euclidean <- function(x1, y1, x2, y2) {
   dist(rbind(c(x1,y1),c(x2,y2)), method = "euclidean")
 }
@@ -75,10 +79,25 @@ objects.distance <- function(d1, d2, data.description) {
             left.attributes <<- left.attributes[left.attributes != x.col] 
             left.attributes <<- left.attributes[left.attributes != y.col] 
             
-            distance.euclidean(d1[x.col], d1[y.col], d2[x.col], d2[y.col])
+            distance.euclidean(d1[x.col], d1[y.col], d2[,x.col], d2[,y.col])
           }
         )
       )
+  }
+  
+  # geographic coordinates
+  if(length(data.description$geographic.coordinates) > 0) {
+    distance = distance + do.call(sum, lapply(data.description$geographic.coordinates, function(geo.point) {
+          long.col = geo.point$long
+          lat.col = geo.point$lat
+          
+          left.attributes <<- left.attributes[left.attributes != long.col] 
+          left.attributes <<- left.attributes[left.attributes != lat.col] 
+          
+          distance.haversine(d1[long.col], d1[lat.col], d2[,long.col], d2[,lat.col])
+        }
+      )
+    )
   }
 
   if(length(d1[left.attributes]) > 0) {
