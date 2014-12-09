@@ -21,10 +21,36 @@ split.data <- function(data, percent) {
 }
 
 rate.cluster <- function(cluster.model, data, data.description) {
-  class.column <- data.description$classIndex
+  class.column <- data.description$class.column
   
-  # TODO
-  sample(seq(0.1, 0.9, 0.1), 1)
+  quality = 0
+  
+  # rand index
+  if(is.null(data.description$class.column) == FALSE) {
+    a <- 0
+    b <- 0
+    
+    lapply(1:length(cluster.model$cluster), function(i) {
+      if(i+1 <= length(cluster.model$cluster)) {
+        lapply((i+1):length(cluster.model$cluster), function(j) {
+          i.class = data[i,][class.column]
+          j.class = data[j,][class.column]
+          
+          i.prediction = cluster.model$cluster[i]
+          j.prediction = cluster.model$cluster[j]
+          if(i.prediction == j.prediction && i.class == j.class) {
+            a <<- a + 1
+          } else if(i.prediction != j.prediction && i.class != j.class) {
+            b <<- b + 1
+          }
+        })
+      }
+    })
+    
+    quality <- 2*(a+b)/(nrow(data)*(nrow(data) - 1))
+  }
+  
+  quality
 }
 
 remove.class.column <- function(data, classIndex) {
@@ -37,7 +63,7 @@ test.clustering <- function(data, data.description, data.description.spatial) {
   clustering.quality <- c()
   clustering.quality.spatial <- c()
   
-  portions <- seq(10, 100, 10)
+  portions <- seq(1, 2, 1)
   
   for(portion in portions) {
     splitted.data <- split.data(data, portion)
@@ -45,10 +71,11 @@ test.clustering <- function(data, data.description, data.description.spatial) {
     execution.time <- system.time(cluster.model <- spatial.cluster(splitted.data, data.description))
     execution.time.spatial <- system.time(cluster.model.spatial <- spatial.cluster(splitted.data, data.description.spatial))
     
-    quality <- rate.cluster(cluster.model, data, data.description)
-    quality.spatial <- rate.cluster(cluster.model.spatial, data, data.description)
+    quality <- rate.cluster(cluster.model, splitted.data, data.description)
+    quality.spatial <- rate.cluster(cluster.model.spatial, splitted.data, data.description)
     
     print('done')
+    print(portion)
     execution.times = append(execution.times, execution.time[3])
     execution.times.spatial = append(execution.times.spatial, execution.time.spatial[3])
     clustering.quality = append(clustering.quality, quality)
@@ -56,9 +83,16 @@ test.clustering <- function(data, data.description, data.description.spatial) {
   }
   
   # plots
-  plot(portions, clustering.quality, type = "p", pch = 4, col = "blue", xlab = "percent of training data [%]", ylab = "clustering quality")
+  print('Normal clustering quality:')
+  print(clustering.quality)
+  plot(portions, clustering.quality, type = "p", pch = 4, col = "blue", xlab = "percent of training data [%]", ylab = "clustering quality", ylim = range(c(clustering.quality,clustering.quality.spatial)))
+  
+  print('Spatial clustering quality:')
+  print(clustering.quality.spatial)
   points(portions, clustering.quality.spatial, type = "p", pch = 8, col = "red")
   
+  print('Spatial times:')
   plot(portions, execution.times.spatial, type = "l", col = "red", xlab = "percent of training data [%]", ylab = "execution time [s]")
+  print('Normal times:')
   points(portions, execution.times, type = "l", col = "blue")
 }

@@ -8,6 +8,7 @@
 
 library(sp)
 library(stringdist)
+library(cluster)
 
 
 # by default columns are treated as real
@@ -67,7 +68,7 @@ distance.bray.curtis <- function(val1, val2) {
 distance.real <- function(val1, val2) {
   difference <- abs(val1 - val2)
   if(difference != 0) {
-    difference = difference / sqrt(val1*val1+val2*val2)
+    difference = difference / dist(rbind(c(0,0),c(val1,val2)), method = "euclidean")
   }
   
   difference
@@ -170,6 +171,6 @@ spatial.cluster <- function(data, data.description) {
   objects.distances.matrix <- calculate.distance.matrix(data, data.description)
   
   # cluster data
-  cluster.model <- kmeans(objects.distances.matrix, centers=3)
+  cluster.model <- pam(objects.distances.matrix, k=31)
   cluster.model
 }
