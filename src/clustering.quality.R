@@ -9,6 +9,13 @@
 source('clustering.core.R')
 
 split.data <- function(data, percent) {
+  # Args:
+  #   data: Data which should be splitted.
+  #   precent: Interesting percent of data.
+  #
+  # Returns:
+  #   Sample part of the given data.
+  
   # calculate columns count
   columns.count <- floor(nrow(data) * percent / 100)
   # get data random indexes
@@ -21,6 +28,16 @@ split.data <- function(data, percent) {
 }
 
 rate.cluster <- function(cluster.model, data, data.description) {
+  # Function evalutaing clustering model.
+  #
+  # Args:
+  #   cluster.model: Cluster model.
+  #   data: Data.
+  #   data.description: Data description.
+  #
+  # Returns:
+  #   Cluster mdoel quality (Rand index).
+  
   class.column <- data.description$class.column
   
   quality = 0
@@ -54,10 +71,29 @@ rate.cluster <- function(cluster.model, data, data.description) {
 }
 
 remove.class.column <- function(data, classIndex) {
+  # Removes given column from the data.
+  #
+  # Args:
+  #   data: Data.
+  #   classIndex: Attribute column index.
+  #
+  # Returns:
+  #   Data without given attribute.
+  
   data[,-classIndex]
 }
 
 test.clustering <- function(data, data.description, data.description.spatial) {
+  # Function testing clustering method.
+  #
+  # Args:
+  #   data: Data.
+  #   data.description: Data description without spatial attributes.
+  #   data.description.spatial: Data description with spatial attributes.
+  #
+  # Returns:
+  #   Nothing returns, just draws plots.
+  
   execution.times <- c()
   execution.times.spatial <- c()
   clustering.quality <- c()
