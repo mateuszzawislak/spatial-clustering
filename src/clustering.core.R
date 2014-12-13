@@ -9,6 +9,7 @@
 library(sp)
 library(stringdist)
 library(cluster)
+library(rgeos)
 
 # example data description
 # by default columns are treated as real
@@ -102,6 +103,13 @@ distance.bray.curtis <- function(val1, val2) {
   abs(val1 - val2) / (val1 + val2)
 }
 
+distance.polygons <- function(polygon1, polygon2) {
+  polygon1 <- readWKT(polygon1)
+  polygon2 <- readWKT(polygon2)
+  
+  gDistance(polygon1, polygon2)
+}
+
 distance.real <- function(val1, val2) {
   # Args:
   #   val1: Attribute value
@@ -184,6 +192,16 @@ objects.distance <- function(d1, d2, data.description) {
           }
         )
       )
+  }
+  
+  if(length(data.description$polygons) > 0) {
+    distance = distance + 5*do.call(sum, lapply(data.description$polygons, function(polygon) {
+      left.attributes <<- left.attributes[left.attributes != polygon]
+      
+      distance.polygons(d1[polygon][1,], d2[polygon][1,])
+    }
+    )
+    )
   }
   
   # geographic coordinates
@@ -277,6 +295,6 @@ spatial.cluster <- function(data, data.description) {
   objects.distances.matrix <- calculate.distance.matrix(data, data.description)
   
   # cluster data
-  cluster.model <- pam(objects.distances.matrix, k=31)
+  cluster.model <- pam(objects.distances.matrix, k=6)
   cluster.model
 }

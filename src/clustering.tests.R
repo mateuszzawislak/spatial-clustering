@@ -33,8 +33,13 @@ usa.cities.description.spatial <- list(
   "geographic.coordinates" = list(list("long" = "V7", "lat" = "V6"))
 )
 
+police.description <- list(
+  "ignore.columns" = c("AREA","PERIMETER","CNTY_","CNTY_ID","NAME","STATE_NAME","STATE_FIPS","CNTY_FIPS","FIPS","FIPSNO","POLICE","POP"),
+  "polygons" = list("V22")
+)
+
 main <- function() {
-  uciData <- read.csv(file="../data/USA_Cities.csv", head=FALSE, sep=";", skip=0, dec=".")
+  uciData <- read.csv(file="../data/police.csv", head=TRUE, sep=",", skip=0, dec=".")
   
-  system.time(test.clustering(uciData, usa.cities.description, usa.cities.description.spatial))
+  system.time(test.clustering(uciData, police.description, police.description))
 }
