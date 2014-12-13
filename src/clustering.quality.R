@@ -83,7 +83,7 @@ remove.class.column <- function(data, classIndex) {
   data[,-classIndex]
 }
 
-test.clustering <- function(data, data.description, data.description.spatial) {
+test.clustering <- function(data, clustering.description) {
   # Function testing clustering method.
   #
   # Args:
@@ -93,6 +93,12 @@ test.clustering <- function(data, data.description, data.description.spatial) {
   #
   # Returns:
   #   Nothing returns, just draws plots.
+  
+  data.description <- clustering.description$data.description
+  clustering.description.nonspatial <- clustering.description
+  clustering.description.nonspatial$params["spatial"] <- FALSE
+  clustering.description.spatial <- clustering.description
+  clustering.description.spatial$params["spatial"] <- TRUE
   
   execution.times <- c()
   execution.times.spatial <- c()
@@ -104,14 +110,15 @@ test.clustering <- function(data, data.description, data.description.spatial) {
   for(portion in portions) {
     splitted.data <- split.data(data, portion)
     
-    execution.time <- system.time(cluster.model <- spatial.cluster(splitted.data, data.description))
-    execution.time.spatial <- system.time(cluster.model.spatial <- spatial.cluster(splitted.data, data.description.spatial))
+    execution.time <- system.time(cluster.model <- spatial.cluster(splitted.data, clustering.description.nonspatial))
+    execution.time.spatial <- system.time(cluster.model.spatial <- spatial.cluster(splitted.data, clustering.description.spatial))
     
     quality <- rate.cluster(cluster.model, splitted.data, data.description)
     quality.spatial <- rate.cluster(cluster.model.spatial, splitted.data, data.description)
     
-    print('done')
+    print('Done part:')
     print(portion)
+    
     execution.times = append(execution.times, execution.time[3])
     execution.times.spatial = append(execution.times.spatial, execution.time.spatial[3])
     clustering.quality = append(clustering.quality, quality)
