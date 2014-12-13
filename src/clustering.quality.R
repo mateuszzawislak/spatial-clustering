@@ -22,7 +22,7 @@ split.data <- function(data, percent) {
   random.indexes <- sample(seq(1,nrow(data)),columns.count, replace=FALSE)
   
   # select data
-  selected.data <- data[random.indexes,]
+  selected.data <- data[sort(random.indexes),]
   
   selected.data
 }
@@ -105,7 +105,7 @@ test.clustering <- function(data, clustering.description) {
   clustering.quality <- c()
   clustering.quality.spatial <- c()
   
-  portions <- seq(1, 2, 1)
+  portions <- seq(100, 100, 1)
   
   for(portion in portions) {
     splitted.data <- split.data(data, portion)
