@@ -24,7 +24,8 @@ wine.clustering.description <- list(
   "data.description" = wine.data.description,
   
   "params" = list(
-    "clusters.number" = 6
+    "clusters.number" = 6,
+    "weight.vector" = list("non.spatial" = 1, "spatial" = 1)
   )
 )
 
@@ -39,13 +40,14 @@ usa.cities.clustering.description <- list (
   "data.description" = usa.cities.description,
   
   "params" = list(
-    "clusters.number" = 31
+    "clusters.number" = 31,
+    "weight.vector" = list("non.spatial" = 1, "spatial" = 1)
   )
 )
 
-# Police Crime Reports data
+# Mississippi Police Crime Reports data
 police.data.description <- list(
-  "numerical.columns" = list(list(col = "TAX")),
+  "numerical.columns" = list(list(col = "TAX"), list(col = "TRANSFER"), list(col = "INC"), list(col = "CRIME"), list(col = "UNEMP"), list(col = "OWN"), list(col = "COLLEGE"), list(col = "WHITE"), list(col = "COMMUTE")),
   "polygons" = list(list(col = "V22"))
 )
 
@@ -53,7 +55,8 @@ police.clustering.description <- list (
   "data.description" = police.data.description,
   
   "params" = list(
-    "clusters.number" = 6
+    "clusters.number" = 6,
+    "weight.vector" = list("non.spatial" = 1, "spatial" = 14)
    )
 )
 

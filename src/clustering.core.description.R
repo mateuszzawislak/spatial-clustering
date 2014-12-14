@@ -9,12 +9,13 @@
 library(rgeos)
 
 # example clustering description
-# by default columns are treated as real
 example.clustering.description <- list (
   "data.description" = list(
-    "class.column" = "V3",
-    "ignore.columns" = c("V1", "V2", "V4"),
-    "geographic.coordinates" = list(list("long" = "V7", "lat" = "V6"))
+    "class.column" = c("V1"),
+    "string.columns" = list(list(col = "V1")),
+    "numerical.columns" = list(list(col = "V6"), list(col = "V7"), list(col = "V8"), list(col = "V9")),
+    "points" = list(list("x" = list(col = "V2"), "y" = list(col = "V5"))),
+    "geographic.coordinates" = list(list("long" = list(col = "V3"), "lat" = list(col = "V4")))
   ),
   
   "params" = list(
@@ -24,11 +25,11 @@ example.clustering.description <- list (
 
 get.attributes.columns <- function(data, clustering.description) {
   # Args:
-  #   data: Data
-  #   data.description: Data description
+  #   data: Data.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
-  #   Attributes array that should be calculated by the clustering algorithm
+  #   Attributes array that should be calculated by the clustering algorithm.
   
   data.description <- clustering.description$data.description
   
@@ -74,6 +75,15 @@ get.attributes.columns <- function(data, clustering.description) {
 }
 
 append.features.ranges <- function(objects, clustering.description) {
+  # Function that appends clustering description with all features' values ranges.
+  #
+  # Args:
+  #   data: Data.
+  #   clustering.description: Data description and clustering params.
+  #
+  # Returns:
+  #  New clustering description with all features' values ranges.
+  
   data.description <- clustering.description$data.description
   
   # points

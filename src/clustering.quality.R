@@ -88,8 +88,7 @@ test.clustering <- function(data, clustering.description) {
   #
   # Args:
   #   data: Data.
-  #   data.description: Data description without spatial attributes.
-  #   data.description.spatial: Data description with spatial attributes.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
   #   Nothing returns, just draws plots.

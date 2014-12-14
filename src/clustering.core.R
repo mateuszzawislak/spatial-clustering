@@ -19,8 +19,8 @@ source('clustering.core.description.R')
 
 get.column.index <- function(data, columnName) {
   # Args:
-  #   data: Data
-  #   columnName: Column name
+  #   data: Data.
+  #   columnName: Column name.
   #
   # Returns:
   #   Column index for the give column name
@@ -30,8 +30,8 @@ get.column.index <- function(data, columnName) {
 
 get.column.name <- function(data, index) {
   # Args:
-  #   data: Data
-  #   index: Column index
+  #   data: Data.
+  #   index: Column index.
   #
   # Returns:
   #   Column name for the give column index
@@ -43,8 +43,8 @@ get.column.name <- function(data, index) {
 
 distance.bray.curtis <- function(val1, val2) {
   # Args:
-  #   val1: Attribute value
-  #   val2: Another attribute value
+  #   val1: Attribute value.
+  #   val2: Another attribute value.
   #
   # Returns:
   #   Bray Curtis distance between given attribute's values.
@@ -53,6 +53,13 @@ distance.bray.curtis <- function(val1, val2) {
 }
 
 distance.polygons <- function(polygon1, polygon2) {
+  # Args:
+  #   polygon1: Polygon description accepted by rgeos package.
+  #   polygon2: Second polygon.
+  #
+  # Returns:
+  #   Length of the shortest path between the given polygons.
+  
   polygon1 <- readWKT(polygon1)
   polygon2 <- readWKT(polygon2)
   
@@ -61,11 +68,13 @@ distance.polygons <- function(polygon1, polygon2) {
 
 distance.real <- function(val1, val2, min.val = 0, max.val = 1) {
   # Args:
-  #   val1: Attribute value
-  #   val2: Another attribute value
+  #   val1: Attribute value.
+  #   val2: Another attribute value.
+  #   min.val: Minimum value of the feature in the collection.
+  #   max.val: Maximum value of the feature in the collection.
   #
   # Returns:
-  #   Distance between given attribute's values, which type is numerical.
+  #   Scaled distance between given attribute's values, which type is numerical.
   
   difference <- abs(val1 - val2)
   if(min.val - max.val != 0) {
@@ -77,34 +86,34 @@ distance.real <- function(val1, val2, min.val = 0, max.val = 1) {
 
 distance.haversine <- function(long1, lat1, long2, lat2) {
   # Args:
-  #   long1: First point's longitude
-  #   lat1: First point's latitude
-  #   long2: Second point's longitude
-  #   lat2: Second point's latitude
+  #   long1: First point's longitude.
+  #   lat1: First point's latitude.
+  #   long2: Second point's longitude.
+  #   lat2: Second point's latitude.
   #
   # Returns:
-  #   Haversine distance between two given geographic coordinates
+  #   Haversine distance between two given geographic coordinates.
   
-  distHaversine(c(long1,lat1),c(long2,lat2))
+  distHaversine(c(long1, lat1), c(long2, lat2))
 }
 
 distance.euclidean <- function(x1, y1, x2, y2) {
   # Args:
-  #   x1: First point's x value
-  #   y1: First point's y value
-  #   x2: Second point's x value
-  #   y2: Second point's y value
+  #   x1: First point's x value.
+  #   y1: First point's y value.
+  #   x2: Second point's x value.
+  #   y2: Second point's y value.
   #
   # Returns:
-  #   Euclidian distance between two given points
+  #   Euclidian distance between two given points.
   
   dist(rbind(c(x1,y1), c(x2,y2)), method = "euclidean")
 }
 
 distance.levensthein <- function(x, y) {
   # Args:
-  #   x: First string
-  #   y: Second string
+  #   x: First string.
+  #   y: Second string.
   #
   # Returns:
   #   Levensthein distance between two given strings.
@@ -114,11 +123,11 @@ distance.levensthein <- function(x, y) {
 
 string.distance <- function(x, y) {
   # Args:
-  #   x: First string
-  #   y: Second string
+  #   x: First string.
+  #   y: Second string.
   #
   # Returns:
-  #   Scalded distance between two given strings.
+  #   Scaled distance between two given strings.
   
   distance.levensthein(x, y)/max(length(x), length(y))
 }
@@ -128,22 +137,24 @@ objects.distance <- function(d1, d2, clustering.description) {
   # It sums distances between all atrributes values.
   #
   # Args:
-  #   d1: First object
-  #   d2: Second object
-  #   data.description: Data description
+  #   d1: First object.
+  #   d2: Second object.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
   #   Distance bettween two given objects.
   
   data.description <- clustering.description$data.description
   is.spatial <- clustering.description$params$spatial
+  spatial.weight <- clustering.description$params$weight.vector$spatial
+  nonspatial.weight <- clustering.description$params$weight.vector$non.spatial
   
   distance = 0
   
   # points
   if(length(data.description$points) > 0) {
     if (is.spatial) {
-      distance = distance + do.call(sum, lapply(data.description$points, function(point) {
+      distance = distance + spatial.weight * do.call(sum, lapply(data.description$points, function(point) {
               x.col = point$x$col
               y.col = point$y$col
 
@@ -152,7 +163,7 @@ objects.distance <- function(d1, d2, clustering.description) {
           )
         )
     } else {
-      distance = distance + do.call(sum, lapply(data.description$points, function(point) {
+      distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$points, function(point) {
               x.col = point$x$col
               y.col = point$y$col
 
@@ -169,13 +180,13 @@ objects.distance <- function(d1, d2, clustering.description) {
   # polygons
   if(length(data.description$polygons) > 0) {
     if (is.spatial) {
-          distance = distance + do.call(sum, lapply(data.description$polygons, function(polygon) {   
+          distance = distance + spatial.weight * do.call(sum, lapply(data.description$polygons, function(polygon) {   
             distance.polygons(d1[polygon$col][1,], d2[polygon$col][1,])/distance.euclidean(x1 = polygon$xminmin, y1 = polygon$yminmin, x2 = polygon$xmaxmax, y2 = polygon$ymaxmax)
           }
         )
       )
     } else {
-        distance = distance + do.call(sum, lapply(data.description$polygons, function(polygon) {   
+        distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$polygons, function(polygon) {   
             polygon1 <- readWKT(d1[polygon$col][1,])
             polygon2 <- readWKT(d2[polygon$col][1,])
             
@@ -197,7 +208,7 @@ objects.distance <- function(d1, d2, clustering.description) {
   # geographic coordinates
   if(length(data.description$geographic.coordinates) > 0) {
     if (is.spatial) {
-      distance = distance + do.call(sum, lapply(data.description$geographic.coordinates, function(geo.point) {
+      distance = distance + spatial.weight * do.call(sum, lapply(data.description$geographic.coordinates, function(geo.point) {
             long.col = geo.point$long$col
             lat.col = geo.point$lat$col
 
@@ -206,7 +217,7 @@ objects.distance <- function(d1, d2, clustering.description) {
         )
       )
     } else {
-      distance = distance + do.call(sum, lapply(data.description$geographic.coordinates, function(geo.point) {
+      distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$geographic.coordinates, function(geo.point) {
             long.col = geo.point$long$col
             lat.col = geo.point$lat$col
             
@@ -222,14 +233,14 @@ objects.distance <- function(d1, d2, clustering.description) {
   
   # string attributes
   if(length(data.description$string.columns) > 0) {
-    distance = distance + do.call(sum, lapply(data.description$string.columns,function(column) {
+    distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$string.columns,function(column) {
       string.distance(d1[column$col], d2[column$col])
     }))
   }
 
-  # distance for attributes type real
+  # distance for numerical type attributes
   if(length(data.description$numerical.columns) > 0) {
-    distance = distance + do.call(sum, lapply(data.description$numerical.columns,function(column) {
+    distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$numerical.columns,function(column) {
       distance.real(d1[column$col], d2[column$col], min.val = column$min, max.val = column$max)
     }))
   }
@@ -241,9 +252,9 @@ calculate.distances.from.object <- function(objects, object, clustering.descript
   # Function that calculates distances between given object and the list of objects.
   #
   # Args:
-  #   objects: List of objects
-  #   object: Core object
-  #   clustering.description: Clustering description
+  #   objects: List of objects.
+  #   object: Core object.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
   #   The vector of distances from object to each one from objects.
@@ -258,8 +269,8 @@ calculate.distance.matrix <- function(objects, clustering.description) {
   # It calculates only bottom-left part of matrix, because it is symetric.
   #
   # Args:
-  #   objects: List of objects
-  #   clustering.description: Clustering description
+  #   objects: List of objects.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
   #   Distance matrix between given objects.
@@ -288,8 +299,8 @@ spatial.cluster <- function(data, clustering.description) {
   # Function that clusters data.
   #
   # Args:
-  #   data: Data to cluster
-  #   clustering.description: Clustering description
+  #   data: Data to cluster.
+  #   clustering.description: Data description and clustering params.
   #
   # Returns:
   #   Cluster model.
