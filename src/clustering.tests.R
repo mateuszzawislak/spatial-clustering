@@ -63,5 +63,5 @@ police.clustering.description <- list (
 main <- function() {
   uciData <- read.csv(file="../data/police.csv", head=TRUE, sep=",", skip=0, dec=".")
   
-  system.time(test.clustering(uciData, police.clustering.description))
+  system.time(testClustering(uciData, police.clustering.description))
 }

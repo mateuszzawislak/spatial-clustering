@@ -23,7 +23,7 @@ example.clustering.description <- list (
   )
 )
 
-get.attributes.columns <- function(data, clustering.description) {
+getAttributesColumns <- function(data, clustering.description) {
   # Args:
   #   data: Data.
   #   clustering.description: Data description and clustering params.
@@ -74,7 +74,7 @@ get.attributes.columns <- function(data, clustering.description) {
   column.names
 }
 
-append.features.ranges <- function(objects, clustering.description) {
+appendFeaturesRanges <- function(objects, clustering.description) {
   # Function that appends clustering description with all features' values ranges.
   #
   # Args:

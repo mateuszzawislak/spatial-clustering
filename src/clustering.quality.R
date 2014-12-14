@@ -8,7 +8,7 @@
 
 source('clustering.core.R')
 
-split.data <- function(data, percent) {
+splitData <- function(data, percent) {
   # Args:
   #   data: Data which should be splitted.
   #   precent: Interesting percent of data.
@@ -27,7 +27,7 @@ split.data <- function(data, percent) {
   selected.data
 }
 
-rate.cluster <- function(cluster.model, data, data.description) {
+rateCluster <- function(cluster.model, data, data.description) {
   # Function evalutaing clustering model.
   #
   # Args:
@@ -70,7 +70,7 @@ rate.cluster <- function(cluster.model, data, data.description) {
   quality
 }
 
-remove.class.column <- function(data, classIndex) {
+removeClassColumn <- function(data, classIndex) {
   # Removes given column from the data.
   #
   # Args:
@@ -83,7 +83,7 @@ remove.class.column <- function(data, classIndex) {
   data[,-classIndex]
 }
 
-test.clustering <- function(data, clustering.description) {
+testClustering <- function(data, clustering.description) {
   # Function testing clustering method.
   #
   # Args:
@@ -107,13 +107,13 @@ test.clustering <- function(data, clustering.description) {
   portions <- seq(100, 100, 1)
   
   for(portion in portions) {
-    splitted.data <- split.data(data, portion)
+    splitted.data <- splitData(data, portion)
     
-    execution.time <- system.time(cluster.model <- spatial.cluster(splitted.data, clustering.description.nonspatial))
-    execution.time.spatial <- system.time(cluster.model.spatial <- spatial.cluster(splitted.data, clustering.description.spatial))
+    execution.time <- system.time(cluster.model <- spatialCluster(splitted.data, clustering.description.nonspatial))
+    execution.time.spatial <- system.time(cluster.model.spatial <- spatialCluster(splitted.data, clustering.description.spatial))
     
-    quality <- rate.cluster(cluster.model, splitted.data, data.description)
-    quality.spatial <- rate.cluster(cluster.model.spatial, splitted.data, data.description)
+    quality <- rateCluster(cluster.model, splitted.data, data.description)
+    quality.spatial <- rateCluster(cluster.model.spatial, splitted.data, data.description)
     
     print('Done part:')
     print(portion)
