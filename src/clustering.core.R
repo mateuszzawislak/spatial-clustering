@@ -78,9 +78,9 @@ distanceReal <- function(val1, val2, min.val = 0, max.val = 1) {
   
   difference <- abs(val1 - val2)
   if(min.val - max.val != 0) {
-    difference = difference / abs(min.val - max.val)
-  }  
-
+    difference <- difference / abs(min.val - max.val)
+  }
+  
   difference
 }
 
@@ -240,9 +240,10 @@ objectsDistance <- function(d1, d2, clustering.description) {
 
   # distance for numerical type attributes
   if(length(data.description$numerical.columns) > 0) {
-    distance = distance + nonspatial.weight * do.call(sum, lapply(data.description$numerical.columns,function(column) {
-      distanceReal(d1[column$col], d2[column$col], min.val = column$min, max.val = column$max)
-    }))
+    numerical.columns <- do.call(c, lapply(data.description$numerical.columns, function(column) {column$col}))
+    numerical.columns.val <- do.call(cbind, lapply(data.description$numerical.columns, function(column) {c(column$min, column$max)}))
+    
+    distance = distance + nonspatial.weight * sum(mapply(function(x, y, min.val, max.val) {distanceReal(x, y, min.val = min.val, max.val = max.val)}, d1[,numerical.columns], d2[,numerical.columns], numerical.columns.val[1,], numerical.columns.val[2,]))
   }
   
   distance
@@ -309,6 +310,8 @@ spatialCluster <- function(data, clustering.description) {
   objectsDistances.matrix <- calculateDistanceMatrix(data, clustering.description)
   
   # cluster data
-  cluster.model <- pam(objectsDistances.matrix, k=clustering.description$params$clusters.number)
+  print('Started PAM clustering')
+  cluster.model <- pam(objectsDistances.matrix, k = clustering.description$params$clusters.number)
+  print('Clustering completed')
   cluster.model
 }

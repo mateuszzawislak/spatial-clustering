@@ -95,16 +95,16 @@ testClustering <- function(data, clustering.description) {
   
   data.description <- clustering.description$data.description
   clustering.description.nonspatial <- clustering.description
-  clustering.description.nonspatial$params["spatial"] <- FALSE
+  clustering.description.nonspatial$params$spatial <- FALSE
   clustering.description.spatial <- clustering.description
-  clustering.description.spatial$params["spatial"] <- TRUE
+  clustering.description.spatial$params$spatial <- TRUE
   
   execution.times <- c()
   execution.times.spatial <- c()
   clustering.quality <- c()
   clustering.quality.spatial <- c()
   
-  portions <- seq(100, 100, 1)
+  portions <- seq(100, 100, 10)
   
   for(portion in portions) {
     splitted.data <- splitData(data, portion)
@@ -134,7 +134,9 @@ testClustering <- function(data, clustering.description) {
   points(portions, clustering.quality.spatial, type = "p", pch = 8, col = "red")
   
   print('Spatial times:')
+  print(execution.times.spatial)
   plot(portions, execution.times.spatial, type = "l", col = "red", xlab = "percent of training data [%]", ylab = "execution time [s]")
   print('Normal times:')
+  print(execution.times)
   points(portions, execution.times, type = "l", col = "blue")
 }
