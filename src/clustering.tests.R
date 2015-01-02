@@ -62,7 +62,6 @@ police.clustering.description <- list (
 
 # Housing and neighborhood data for the city of Boston.
 housing.data.description <- list(
-  "class.column" = "TOWN",
   "numerical.columns" = list(list(col = "CMEDV"), list(col = "CRIM"), list(col = "ZN"), list(col = "INDUS"), list(col = "CHAS"), list(col = "NOX"), list(col = "RM"), list(col = "AGE"), list(col = "DIS"), list(col = "RAD"), list(col = "TAX"), list(col = "PTRATIO"), list(col = "B"), list(col = "LSTAT")),
   "geographic.coordinates" = list(list("long" = list(col = "LON"), "lat" = list( col = "LAT")))
 )
@@ -76,8 +75,10 @@ housing.clustering.description <- list (
   )
 )
 
+# uciData <- read.csv(file="../data/boston.txt", head=TRUE, sep=",", skip=0, dec=".")
+
 main <- function() {
-  uciData <- read.csv(file="../data/boston.txt", head=TRUE, sep=",", skip=0, dec=".")
+  uciData <- read.csv(file="../data/police.csv", head=TRUE, sep=",", skip=0, dec=".")
   
-  system.time(testClustering(uciData, housing.clustering.description))
+  system.time(testClustering(uciData, police.clustering.description))
 }

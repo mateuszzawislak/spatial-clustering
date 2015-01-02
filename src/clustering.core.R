@@ -49,7 +49,7 @@
 #' 
 #' # cluster data
 #' uciData <- read.csv(file="../data/police.csv", head=TRUE, sep=",", skip=0, dec=".")
-#' spatialCluster(uciData, clustering.description.nonspatial)
+#' spatialCluster(uciData, police.clustering.description)
 #' @docType package
 
 library(sp)
@@ -423,7 +423,7 @@ calculateDistanceMatrix <- function(objects, clustering.description) {
 #' 
 #' # cluster data
 #' uciData <- read.csv(file="../data/police.csv", head=TRUE, sep=",", skip=0, dec=".")
-#' spatialCluster(uciData, clustering.description.nonspatial)
+#' spatialCluster(uciData, police.clustering.description)
 spatialCluster <- function(data, clustering.description) {  
   # distance matrix
   objectsDistances.matrix <- calculateDistanceMatrix(data, clustering.description)
