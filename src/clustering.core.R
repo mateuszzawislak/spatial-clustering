@@ -391,9 +391,27 @@ calculateDistanceMatrix <- function(objects, clustering.description) {
 }
 
 #' Function that clusters data with PAM algorithm.
+#' 
+#' Clustering data description must have two parts: \code{data.description} which contains data descrption and \code{params} which contains clustering algorithm parameters.
+#' \cr Data must have \code{data.frame} type and can be (for example) read from file with \code{read.csv} function.
+#' 
+#' @details
+#' \bold{Possible data description fields:}\cr
+#' \code{string.columns} - string features\cr
+#' \code{numerical.columns} - numerical features\cr
+#' \code{points} - points features\cr
+#' \code{geographic.coordinates} - geographic coordinates features\cr
+#' \code{polygons} - polygons features\cr
+#' 
+#' \bold{Clustering params description (all fields must be filled):}\cr
+#' \code{clusters.number} - weight of spatial components' distance (\code{spatial}) of the normal components' distance (\code{non.spatial})\cr
+#' \code{weight.vector} - numerical features\cr
+#' \code{spatial} - decides whether spatial data considered as spatial data\cr
+#' 
+#' \bold{Example data description is shown below (in the examples)!}
 #'
-#' @param data data to cluster
-#' @param clustering.description data, description and clustering params
+#' @param data data to cluster (data.frame type, for example read by read.csv function)
+#' @param clustering.description description and clustering params
 #'
 #' @return cluster model
 #' 
@@ -402,6 +420,24 @@ calculateDistanceMatrix <- function(objects, clustering.description) {
 #' @export
 #' 
 #' @examples
+#' 
+#' # structure of data descrption
+#' example.clustering.description <- list (
+#' "data.description" = list(
+#'   "class.column" = c("V1"),
+#'   "string.columns" = list(list(col = "V1")),
+#'   "numerical.columns" = list(list(col = "V6"), list(col = "V7"), list(col = "V8"), list(col = "V9")),
+#'   "points" = list(list("x" = list(col = "V2"), "y" = list(col = "V5"))),
+#'   "geographic.coordinates" = list(list("long" = list(col = "V3"), "lat" = list(col = "V4")))
+#' ),
+#' 
+#' "params" = list(
+#'   "clusters.number" = 6,
+#'   "weight.vector" = list("non.spatial" = 1, "spatial" = 14),
+#'   "spatial" = TRUE
+#' )
+#' )
+#' 
 #' # Mississippi Police Crime Reports data description
 #' 
 #' police.data.description <- list(
